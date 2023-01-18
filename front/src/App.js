@@ -25,12 +25,13 @@ function App() {
   const { location, cancelLocationWatch, error } = useWatchLocation(geolocationOptions);
 
   useEffect(() => {
+    console.log(location);
     if (!location) return;
     
     // 3초후에 watch 종료
     setTimeout(() => {
       cancelLocationWatch();
-    }, 300000);
+    }, 3000);
   }, []);
 
   const { coords, isGeolocationAvailable, isGeolocationEnabled } =
@@ -42,12 +43,6 @@ function App() {
   });
 
   const [center, setCenter] = useState({lat: 0, lng: 0});
-
-  const handleClick = () => {
-    let temp = center;
-    temp.lat = coords.latitude + 0.1;
-    setCenter(temp);
-  }
 
   useEffect(() => {
     if(coords !== undefined){
@@ -72,8 +67,7 @@ function App() {
         {coords !== undefined ? <Marker position={center} /> : <></> }
       </GoogleMap>
     </LoadScript>
-    <button onClick={() => handleClick()}>button</button>
-    <div>{location.latitude, location.longitude}</div>
+    {location!==undefined ? <div>{location.latitude}, {location.longitude}</div> : <></> }
     </div>
 
   );
