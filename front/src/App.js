@@ -2,6 +2,13 @@ import './App.css';
 import React, { Component, useEffect, useState } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { useGeolocated } from "react-geolocated";
+import useWatchLocation from './hooks/useWatchLocation';
+
+const geolocationOptions = {
+  enableHighAccuracy: true,
+  timeout: 1000 * 60 * 1, // 1 min (1000 ms * 60 sec * 1 minute = 60 000ms)
+  maximumAge: 1000 * 3600 * 24, // 24 hour
+};
 
 const containerStyle = {
   width: '400px',
@@ -14,6 +21,17 @@ const containerStyle = {
 // };
 
 function App() {
+
+  const { location, cancelLocationWatch, error } = useWatchLocation(geolocationOptions);
+
+  useEffect(() => {
+    if (!location) return;
+    
+    // 3초후에 watch 종료
+    setTimeout(() => {
+      cancelLocationWatch();
+    }, 300000);
+  }, []);
 
   const { coords, isGeolocationAvailable, isGeolocationEnabled } =
   useGeolocated({
@@ -29,7 +47,6 @@ function App() {
     let temp = center;
     temp.lat = coords.latitude + 0.1;
     setCenter(temp);
-    // temp.lng = coords.longitude;
   }
 
   useEffect(() => {
@@ -52,10 +69,11 @@ function App() {
         zoom={10}
       >
         { /* Child components, such as markers, info windows, etc. */ }
-        <></>
+        {coords !== undefined ? <Marker position={center} /> : <></> }
       </GoogleMap>
     </LoadScript>
     <button onClick={() => handleClick()}>button</button>
+    <div>{location.latitude, location.longitude}</div>
     </div>
 
   );
